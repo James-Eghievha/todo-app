@@ -19,15 +19,26 @@ function App() {
   const [editIndex, setEditIndex] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
-
+  const [searchTerm, setSearchTerm] = useState('');
+  const [newDueDate, setNewDueDate] = useState('');
   const allTodos = useSelector((state) => state.todos.allTodos);
   const completedTodos = useSelector((state) => state.todos.completedTodos);
   const dispatch = useDispatch();
 
+
+
+
   const handleAddTodo = () => {
-    dispatch(addTodo({ title: newTitle, description: newDescription }));
-    setNewTitle('');
-    setNewDescription('');
+    dispatch(
+      addTodo({
+        title: newTitle,
+        description: newDescription,
+        dueDate: newDueDate,
+      })
+    );
+    setNewTitle("");
+    setNewDescription("");
+    setNewDueDate("");
   };
 
   const handleComplete = (index) => {
@@ -37,6 +48,26 @@ function App() {
   const handleDeleteCompleted = (index) => {
     dispatch(deleteCompleted(index));
   };
+  const filteredTodos = allTodos.filter((todo) =>
+  todo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  todo.description.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+ const isOverdue = (date) => {
+  if (!date) return false;
+  const dueDate = new Date(date);
+  const today = new Date();
+  return dueDate.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0);
+};
+
+const isDueSoon = (date) => {
+  if (!date) return false;
+  const dueDate = new Date(date);
+  const today = new Date();
+  const diff = dueDate - today;
+  return diff > 0 && diff <= 3 * 24 * 60 * 60 * 1000; // less than 3 days
+};
+  
 
   return (
     <div className="App">
@@ -65,6 +96,15 @@ function App() {
             />
           </div>
 
+           <div className="todo-input-item">
+            <label>Due Date</label>
+            <input
+              type="date"
+              value={newDueDate}
+              onChange={(e) => setNewDueDate(e.target.value)}
+            />
+          </div>
+
           <div className="todo-input-item">
             <button
               type="button"
@@ -74,18 +114,20 @@ function App() {
               Add
             </button>
           </div>
+
+         
         </div>
 
         {/* For toggling between todo screen and not yet completed task  */}
         <div className="btn-area">
           <button
-            className={`secondaryBtn ${!isCompleteScreen && 'active'}`}
+            className={`secondaryBtn ${!isCompleteScreen && "active"}`}
             onClick={() => setIsCompleteScreen(false)}
           >
             Todo
           </button>
           <button
-            className={`secondaryBtn ${isCompleteScreen && 'active'}`}
+            className={`secondaryBtn ${isCompleteScreen && "active"}`}
             onClick={() => setIsCompleteScreen(true)}
           >
             Completed
@@ -93,9 +135,20 @@ function App() {
         </div>
 
         {/* My Todo List */}
+
+        <div className="search-input">
+          <label>Search Tasks </label>
+          <input
+            type="text"
+            placeholder="Type to search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
         <div className="todo-list">
           {!isCompleteScreen &&
-            allTodos.map((item, index) => {
+            filteredTodos.map((item, index) => {
               const isEditing = editIndex === index;
 
               return (
@@ -105,6 +158,18 @@ function App() {
                       <>
                         <h3>{item.title}</h3>
                         <p>{item.description}</p>
+                        <p
+                          className={
+                            isOverdue(item.dueDate)
+                              ? "overdue"
+                              : isDueSoon(item.dueDate)
+                              ? "soon"
+                              : ""
+                          }
+                        >
+                          <small>Due: {item.dueDate}</small>
+                        </p>
+
                         <button
                           className="secondaryBtnBtn"
                           onClick={() => {
@@ -150,7 +215,6 @@ function App() {
                           onClick={() => handleComplete(index)}
                           title="Complete?"
                         />
-                      
                       </>
                     ) : (
                       <button

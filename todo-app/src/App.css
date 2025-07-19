@@ -132,9 +132,7 @@ h1 {
 .todo-list-item p {
   font-size: 1rem;
   color: rgb(192, 190, 190);
-  margin-top: 0px;
-  font-family: 
-
+  margin-top: 0px; 
 }
 
 .icon {
@@ -165,4 +163,36 @@ h1 {
   padding: 0.4rem;
   margin-bottom: 0.5rem;
   width: 100%;
+}
+
+
+.search-input {
+  background-color: #353434;
+  border: 1px solid rgb(0,230,122);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  width: 90%;
+  color: white;
+}
+
+.search-input input {
+  padding: 0.5rem;
+  border: none;
+  width: 80%;
+  margin-left: 0.5rem;
+}
+
+.todo-list-item .overdue {
+  color: red !important;
+  font-weight: bold;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.todo-list-item .soon {
+  color: orange !important;
+  font-weight: bold;
+  background-color: rgba(255, 165, 0, 0.1);
 }
